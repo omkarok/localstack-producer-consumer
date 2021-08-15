@@ -1,0 +1,251 @@
+1. Getting Localstack Backend Running
+
+2. Installing and setting up packages/dependencies
+
+3. Starting from clean state, verify list-tables and list-functions output to ensure there are no resources created.
+
+awslocal dynamodb list-tables
+{
+    "TableNames": []
+}
+(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ awslocal lambda list-functions
+{
+    "Functions": []
+}
+
+4. CDK Bootstrap (To link/synchronize CDK with localstack)
+
+cdklocal bootstrap
+ ⏳  Bootstrapping environment aws://000000000000/us-east-1...
+CDKToolkit: creating CloudFormation changeset...
+
+
+ ✅  Environment aws://000000000000/us-east-1 bootstrapped.
+
+5. Deploy Infrastructure via CDK
+
+(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ cdklocal deploy
+This deployment will make potentially sensitive changes according to your current security approval level (--require-approval broadening).
+Please confirm you intend to make the following modifications:
+
+IAM Statement Changes
+┌───┬────────────────────────────────────────────────┬────────┬───────────────────────────────────────────────────────────────────────────────┬────────────────────────────────────────────────┬───────────┐
+│   │ Resource                                       │ Effect │ Action                                                                        │ Principal                                      │ Condition │
+├───┼────────────────────────────────────────────────┼────────┼───────────────────────────────────────────────────────────────────────────────┼────────────────────────────────────────────────┼───────────┤
+│ + │ ${create_todo_lambda_function/ServiceRole.Arn} │ Allow  │ sts:AssumeRole                                                                │ Service:lambda.amazonaws.com                   │           │
+├───┼────────────────────────────────────────────────┼────────┼───────────────────────────────────────────────────────────────────────────────┼────────────────────────────────────────────────┼───────────┤
+│ + │ ${to_do_table.Arn}                             │ Allow  │ dynamodb:BatchWriteItem                                                       │ AWS:${create_todo_lambda_function/ServiceRole} │           │
+│   │                                                │        │ dynamodb:DeleteItem                                                           │                                                │           │
+│   │                                                │        │ dynamodb:PutItem                                                              │                                                │           │
+│   │                                                │        │ dynamodb:UpdateItem                                                           │                                                │           │
+└───┴────────────────────────────────────────────────┴────────┴───────────────────────────────────────────────────────────────────────────────┴────────────────────────────────────────────────┴───────────┘    
+IAM Policy Changes
+┌───┬────────────────────────────────────────────┬────────────────────────────────────────────────────────────────────────────────┐
+│   │ Resource                                   │ Managed Policy ARN                                                             │
+├───┼────────────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────┤
+│ + │ ${create_todo_lambda_function/ServiceRole} │ arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole │
+└───┴────────────────────────────────────────────┴────────────────────────────────────────────────────────────────────────────────┘
+(NOTE: There may be security-related changes not in this list. See https://github.com/aws/aws-cdk/issues/1299)
+
+Do you wish to deploy these changes (y/n)? y
+ToDoCrudStack: deploying...
+[0%] start: Publishing c1b72ff52f6a9af22db037e0d59a192fbdc2dd678fa2ad41442e94e16b9dedc8:current
+[100%] success: Published c1b72ff52f6a9af22db037e0d59a192fbdc2dd678fa2ad41442e94e16b9dedc8:current
+ToDoCrudStack: creating CloudFormation changeset...
+
+
+
+ ✅  ToDoCrudStack
+
+Stack ARN:
+arn:aws:cloudformation:us-east-1:000000000000:stack/ToDoCrudStack/f8ba4204
+
+
+(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ awslocal dynamodb list-tables
+{
+    "TableNames": [
+        "ToDoTable"
+    ]
+}
+
+
+(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ awslocal lambda list-functions
+{
+    "Functions": [
+        {
+            "FunctionName": "ToDoCrudStack-lambda-3cbdf4c2",
+            "FunctionArn": "arn:aws:lambda:us-east-1:000000000000:function:ToDoCrudStack-lambda-3cbdf4c2",
+            "Runtime": "python3.8",
+            "Role": "arn:aws:iam::000000000000:role/cf-ToDoCrudStack-createtodolambdafunctionServiceRoleA0696A5F",
+            "Handler": "create_todo.lambda_handler",
+            "CodeSize": 904,
+            "Description": "",
+            "Timeout": 3,
+            "LastModified": "2021-08-15T06:31:40.794+0000",
+            "CodeSha256": "drpoJmyUk/NgaeIkf+0Sd41O6IzXUE9+nZ0x+S8ybbw=",
+            "Version": "$LATEST",
+            "VpcConfig": {},
+            "Environment": {
+                "Variables": {
+                    "TABLE_NAME": "ToDoTable"
+                }
+            },
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "59be2430-8962-4cdb-9b24-14e54582fc2d",
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip"
+        }
+    ]
+}
+
+
+This shows the Stack/Infrastructure created locally using localstack and deployed using CDK (Cloud Development Kit)
+
+The Infrastructure includes a DynamoDb Table, and a Lambda Function which has write access to the Table.
+
+Let's invoke the lambda to create/add to-do's into the DynamoDb table that we created which is named as ToDoTable and should be empty as of now.
+
+(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ awslocal dynamodb scan --table-name ToDoTable
+{
+    "Items": [],
+    "Count": 0,
+    "ScannedCount": 0,
+    "ConsumedCapacity": null
+}
+
+awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoCrudStack-lambda-3cbdf4c2 --payload '{"title": "Task #1","task": "Prepare Breakfast"}' /tmp/output.txt --region us-east-1
+{
+    "StatusCode": 200,
+    "LogResult": "",
+    "ExecutedVersion": "$LATEST"
+}
+(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoCrudStack-lambda-3cbdf4c2 --payload '{"title": "Task #2","task": "Eat Breakfast"}' /tmp/output.txt --region us-east-1
+{
+    "StatusCode": 200,
+    "LogResult": "",
+    "ExecutedVersion": "$LATEST"
+}
+(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoCrudStack-lambda-3cbdf4c2 --payload '{"title": "Task #3","task": "Wash Utensils"}' /tmp/output.txt --region us-east-1
+{
+    "StatusCode": 200,
+    "LogResult": "",
+    "ExecutedVersion": "$LATEST"
+}
+
+
+Yay!! The Lambda invocations returned 200 OK, all went well, hopefully :)
+
+Let's verify
+
+ awslocal dynamodb list-tables
+{
+    "TableNames": [
+        "ToDoTable" <<--- Table Name created automatically by CDK
+    ]
+}
+(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ awslocal dynamodb describe-table --table-name ToDoTable
+{
+    "Table": {
+        "AttributeDefinitions": [
+            {
+                "AttributeName": "id",
+                "AttributeType": "S"
+            }
+        ],
+        "TableName": "ToDoTable",
+        "KeySchema": [
+            {
+                "AttributeName": "id",
+                "KeyType": "HASH"
+            }
+        ],
+        "TableStatus": "ACTIVE",
+        "CreationDateTime": 1629009100.377,
+        "ProvisionedThroughput": {
+            "LastIncreaseDateTime": 0.0,
+            "LastDecreaseDateTime": 0.0,
+            "NumberOfDecreasesToday": 0,
+            "ReadCapacityUnits": 5,
+            "WriteCapacityUnits": 5
+        },
+        "TableSizeBytes": 205,
+        "ItemCount": 3, <--- 3 items have been inserted
+        "TableArn": "arn:aws:dynamodb:us-east-1:000000000000:table/ToDoTable"
+    }
+}
+
+
+Still Not satisfied? OK, let's scan the db and do a final check
+
+ awslocal dynamodb scan --table-name ToDoTable
+{
+    "Items": [
+        {
+            "title": {
+                "S": "Task #1"
+            },
+            "id": {
+                "S": "83635624-a7d2-44b7-aef4-cb368224c6d2"
+            },
+            "task": {
+                "S": "Prepare Breakfast"
+            }
+        },
+        {
+            "title": {
+                "S": "Task #2"
+            },
+            "id": {
+                "S": "1292f96f-4357-4ea3-8f4a-4fba557a97a5"
+            },
+            "task": {
+                "S": "Eat Breakfast"
+            }
+        },
+        {
+            "title": {
+                "S": "Task #3"
+            },
+            "id": {
+                "S": "40c5a63d-bb1e-4007-b0d9-5fbdf4f3ea73"
+            },
+            "task": {
+                "S": "Wash Utensils"
+            }
+        }
+    ],
+    "Count": 3,
+    "ScannedCount": 3,
+    "ConsumedCapacity": null
+}
+
+This Read/Scan was programmatic/console command, now let's automate this via another Lambda function to read all to-do's and get to-do's by id
+
+1. Get All records/ To-do's:
+
+ awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoApiStack-lambda-8bf6e52b /tmp/output.txt --region us-east-1
+{
+    "StatusCode": 200,
+    "LogResult": "",
+    "ExecutedVersion": "$LATEST"
+}
+(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ cat /tmp/output.txt
+{"statusCode":200,"to_do":["{\"title\": \"Task #5\", \"id\": \"c3a0a088-6aa2-4312-b543-0e11d4731ad5\", \"task\": \"Prepare Lunch\"}","{\"title\": \"Task #1\", \"id\": \"83635624-a7d2-44b7-aef4-cb368224c6d2\", \"task\": \"Prepare Breakfast\"}","{\"title\": \"Task #2\", \"id\": \"1292f96f-4357-4ea3-8f4a-4fba557a97a5\", \"task\": \"Eat Breakfast\"}","{\"title\": \"Task #3\", \"id\": \"40c5a63d-bb1e-4007-b0d9-5fbdf4f3ea73\", \"task\": \"Wash Utensils\"}","{\"title\": \"Task #6\", \"id\": \"b3fd766b-c2aa-4943-8c8b-268d37dea0ff\", \"task\": \"Eat Lunch\"}","{\"title\": \"Task #4\", \"id\": \"b6aa74cc-99aa-47eb-8737-ae90630e4332\", \"task\": \"Shop for Groceries\"}"]}
+
+
+
+2. Get specific To-do by UUID:
+
+awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoApiStack-lambda-8bf6e52b /tmp/output.txt --region us-east-1 --payload '{"uuid":"b3fd766b-c2aa-4943-8c8b-268d37dea0ff"}'
+{
+    "StatusCode": 200,
+    "LogResult": "",
+    "ExecutedVersion": "$LATEST"
+}
+(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ cat /tmp/output.txt
+{"getitem":["{\"title\": \"Task #6\", \"id\": \"b3fd766b-c2aa-4943-8c8b-268d37dea0ff\", \"task\": \"Eat Lunch\"}"],"statusCode":200}
+
+
