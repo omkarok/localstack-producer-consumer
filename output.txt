@@ -224,6 +224,55 @@ Still Not satisfied? OK, let's scan the db and do a final check
 
 This Read/Scan was programmatic/console command, now let's automate this via another Lambda function to read all to-do's and get to-do's by id
 
+
+awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoApiStack-lambda-8bf6e52b /tmp/output.txt --region us-east-1
+
+
+cdklocal bootstrap
+ ⏳  Bootstrapping environment aws://000000000000/us-east-1...
+CDKToolkit: creating CloudFormation changeset...
+
+
+ ✅  Environment aws://000000000000/us-east-1 bootstrapped.
+(.venv) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/to_do_api$ cdklocal deploy
+This deployment will make potentially sensitive changes according to your current security approval level (--require-approval broadening).
+Please confirm you intend to make the following modifications:
+
+IAM Statement Changes
+┌───┬─────────────────────────────────────────────────────────────────┬────────┬─────────────────────────────────────────────────────────────────┬─────────────────────────────────────────────────────────────────┬───────────┐
+│   │ Resource                                                        │ Effect │ Action                                                          │ Principal                                                       │ Condition │ 
+├───┼─────────────────────────────────────────────────────────────────┼────────┼─────────────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────────┼───────────┤ 
+│ + │ ${read_todo_lambda_function/ServiceRole.Arn}                    │ Allow  │ sts:AssumeRole                                                  │ Service:lambda.amazonaws.com                                    │           │ 
+├───┼─────────────────────────────────────────────────────────────────┼────────┼─────────────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────────┼───────────┤ 
+│ + │ arn:aws:dynamodb:us-east-1:000000000000:table/ToDoTable         │ Allow  │ dynamodb:BatchGetItem                                           │ AWS:${read_todo_lambda_function/ServiceRole}                    │           │ 
+│   │                                                                 │        │ dynamodb:ConditionCheckItem                                     │                                                                 │           │ 
+│   │                                                                 │        │ dynamodb:GetItem                                                │                                                                 │           │ 
+│   │                                                                 │        │ dynamodb:GetRecords                                             │                                                                 │           │ 
+│   │                                                                 │        │ dynamodb:GetShardIterator                                       │                                                                 │           │ 
+│   │                                                                 │        │ dynamodb:Query                                                  │                                                                 │           │ 
+│   │                                                                 │        │ dynamodb:Scan                                                   │                                                                 │           │ 
+└───┴─────────────────────────────────────────────────────────────────┴────────┴─────────────────────────────────────────────────────────────────┴─────────────────────────────────────────────────────────────────┴───────────┘ 
+IAM Policy Changes
+┌───┬──────────────────────────────────────────┬────────────────────────────────────────────────────────────────────────────────┐
+│   │ Resource                                 │ Managed Policy ARN                                                             │
+├───┼──────────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────┤
+│ + │ ${read_todo_lambda_function/ServiceRole} │ arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole │
+└───┴──────────────────────────────────────────┴────────────────────────────────────────────────────────────────────────────────┘
+(NOTE: There may be security-related changes not in this list. See https://github.com/aws/aws-cdk/issues/1299)
+
+Do you wish to deploy these changes (y/n)? y
+ToDoApiStack: deploying...
+[0%] start: Publishing 1c5e35f511d58ca815b34a3a4505f184b06bd2c8944a68b78d8bced5f2c2e361:current
+[100%] success: Published 1c5e35f511d58ca815b34a3a4505f184b06bd2c8944a68b78d8bced5f2c2e361:current
+ToDoApiStack: creating CloudFormation changeset...
+
+
+
+ ✅  ToDoApiStack
+
+Stack ARN:
+arn:aws:cloudformation:us-east-1:000000000000:stack/ToDoApiStack/e99d2431
+
 1. Get All records/ To-do's:
 
  awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoApiStack-lambda-8bf6e52b /tmp/output.txt --region us-east-1
