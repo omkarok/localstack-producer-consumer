@@ -4,4 +4,5 @@ https://github.com/aws-samples/aws-cdk-examples/tree/901ae3e11704fc378ade673f76f
 
 https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-dynamo-db.html
 
+https://youtu.be/XVHGq2uJu9s
 
