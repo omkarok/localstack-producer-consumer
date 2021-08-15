@@ -1,0 +1,7 @@
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.Python.03.html#GettingStarted.Python.03.02
+
+https://github.com/aws-samples/aws-cdk-examples/tree/901ae3e11704fc378ade673f76f0eeae860a5daf/python/dynamodb-lambda
+
+https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-dynamo-db.html
+
+
