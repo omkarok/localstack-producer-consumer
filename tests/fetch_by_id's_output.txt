@@ -1,0 +1,8 @@
+./fetch_to_do_by_id.sh 
+{
+    "StatusCode": 200,
+    "LogResult": "",
+    "ExecutedVersion": "$LATEST"
+}
+{"getitem":["{\"title\": \"Task #6\", \"id\": \"b3fd766b-c2aa-4943-8c8b-268d37dea0ff\", \"task\": \"Eat Lunch\"}"],"statusCode":200}
+Passed
