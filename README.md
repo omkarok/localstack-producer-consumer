@@ -56,3 +56,11 @@ command.
  * `cdk docs`        open CDK documentation
 
 Enjoy!
+
+Steps to build this project
+
+1. Run docker-compose up to start the localstack server
+
+2. Deploy the stacks using cdklocal bootstrap, cdklocal deploy
+
+3. Run the Lambda Invocations and check outputs, follow output.txt for general flow/sequence

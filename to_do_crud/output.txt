@@ -73,15 +73,15 @@ arn:aws:cloudformation:us-east-1:000000000000:stack/ToDoCrudStack/f8ba4204
 {
     "Functions": [
         {
-            "FunctionName": "ToDoCrudStack-lambda-3cbdf4c2",
-            "FunctionArn": "arn:aws:lambda:us-east-1:000000000000:function:ToDoCrudStack-lambda-3cbdf4c2",
+            "FunctionName": "ToDoCrudStack-lambda-9d4b4c06",
+            "FunctionArn": "arn:aws:lambda:us-east-1:000000000000:function:ToDoCrudStack-lambda-9d4b4c06",
             "Runtime": "python3.8",
             "Role": "arn:aws:iam::000000000000:role/cf-ToDoCrudStack-createtodolambdafunctionServiceRoleA0696A5F",
             "Handler": "create_todo.lambda_handler",
             "CodeSize": 904,
             "Description": "",
             "Timeout": 3,
-            "LastModified": "2021-08-15T06:31:40.794+0000",
+            "LastModified": "2021-08-16T16:06:09.886+0000",
             "CodeSha256": "drpoJmyUk/NgaeIkf+0Sd41O6IzXUE9+nZ0x+S8ybbw=",
             "Version": "$LATEST",
             "VpcConfig": {},
@@ -93,14 +93,39 @@ arn:aws:cloudformation:us-east-1:000000000000:stack/ToDoCrudStack/f8ba4204
             "TracingConfig": {
                 "Mode": "PassThrough"
             },
-            "RevisionId": "59be2430-8962-4cdb-9b24-14e54582fc2d",
+            "RevisionId": "5b98d6cc-0ef7-49c6-9f45-6f9a56990951",
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip"
+        },
+        {
+            "FunctionName": "ToDoApiStack-lambda-69354cc1",
+            "FunctionArn": "arn:aws:lambda:us-east-1:000000000000:function:ToDoApiStack-lambda-69354cc1",
+            "Runtime": "python3.8",
+            "Role": "arn:aws:iam::000000000000:role/cf-ToDoApiStack-readtodolambdafunctionServiceRole63BF0101",
+            "Handler": "read_todo.lambda_handler",
+            "CodeSize": 966,
+            "Description": "",
+            "Timeout": 3,
+            "LastModified": "2021-08-16T16:06:28.600+0000",
+            "CodeSha256": "Z2yRm+cOJWQ4WlqS1+O2eddCDr9G18kiOdhDLrhXYmg=",
+            "Version": "$LATEST",
+            "VpcConfig": {},
+            "Environment": {
+                "Variables": {
+                    "TABLE_NAME": "ToDoTable"
+                }
+            },
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "370efa1a-78d8-4083-9910-fe6390d8edcd",
             "State": "Active",
             "LastUpdateStatus": "Successful",
             "PackageType": "Zip"
         }
     ]
 }
-
 
 This shows the Stack/Infrastructure created locally using localstack and deployed using CDK (Cloud Development Kit)
 
@@ -116,19 +141,19 @@ Let's invoke the lambda to create/add to-do's into the DynamoDb table that we cr
     "ConsumedCapacity": null
 }
 
-awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoCrudStack-lambda-3cbdf4c2 --payload '{"title": "Task #1","task": "Prepare Breakfast"}' /tmp/output.txt --region us-east-1
+awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoCrudStack-lambda-9d4b4c06 --payload '{"title": "Task #1","task": "Prepare Breakfast"}' /tmp/output.txt --region us-east-1
 {
     "StatusCode": 200,
     "LogResult": "",
     "ExecutedVersion": "$LATEST"
 }
-(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoCrudStack-lambda-3cbdf4c2 --payload '{"title": "Task #2","task": "Eat Breakfast"}' /tmp/output.txt --region us-east-1
+(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoCrudStack-lambda-9d4b4c06 --payload '{"title": "Task #2","task": "Eat Breakfast"}' /tmp/output.txt --region us-east-1
 {
     "StatusCode": 200,
     "LogResult": "",
     "ExecutedVersion": "$LATEST"
 }
-(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoCrudStack-lambda-3cbdf4c2 --payload '{"title": "Task #3","task": "Wash Utensils"}' /tmp/output.txt --region us-east-1
+(.todo) omkarok@LAPTOP-45HFTF0N:/mnt/c/Users/omkar/OneDrive/Desktop/To_do_CRUD$ awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoCrudStack-lambda-9d4b4c06 --payload '{"title": "Task #3","task": "Wash Utensils"}' /tmp/output.txt --region us-east-1
 {
     "StatusCode": 200,
     "LogResult": "",
@@ -163,7 +188,7 @@ Let's verify
             }
         ],
         "TableStatus": "ACTIVE",
-        "CreationDateTime": 1629009100.377,
+        "CreationDateTime": 1629125649.86,
         "ProvisionedThroughput": {
             "LastIncreaseDateTime": 0.0,
             "LastDecreaseDateTime": 0.0,
@@ -172,7 +197,7 @@ Let's verify
             "WriteCapacityUnits": 5
         },
         "TableSizeBytes": 205,
-        "ItemCount": 3, <--- 3 items have been inserted
+        "ItemCount": 3, <-- 3 items have been inserted
         "TableArn": "arn:aws:dynamodb:us-east-1:000000000000:table/ToDoTable"
     }
 }
@@ -180,26 +205,15 @@ Let's verify
 
 Still Not satisfied? OK, let's scan the db and do a final check
 
- awslocal dynamodb scan --table-name ToDoTable
+  awslocal dynamodb scan --table-name ToDoTable
 {
     "Items": [
-        {
-            "title": {
-                "S": "Task #1"
-            },
-            "id": {
-                "S": "83635624-a7d2-44b7-aef4-cb368224c6d2"
-            },
-            "task": {
-                "S": "Prepare Breakfast"
-            }
-        },
         {
             "title": {
                 "S": "Task #2"
             },
             "id": {
-                "S": "1292f96f-4357-4ea3-8f4a-4fba557a97a5"
+                "S": "7b30456f-4728-4745-aec1-4190ad391dda"
             },
             "task": {
                 "S": "Eat Breakfast"
@@ -207,10 +221,21 @@ Still Not satisfied? OK, let's scan the db and do a final check
         },
         {
             "title": {
+                "S": "Task #1"
+            },
+            "id": {
+                "S": "d87d86f4-a62d-4a2b-a1e5-1c7a521be19b"
+            },
+            "task": {
+                "S": "Prepare Breakfast"
+            }
+        },
+        {
+            "title": {
                 "S": "Task #3"
             },
             "id": {
-                "S": "40c5a63d-bb1e-4007-b0d9-5fbdf4f3ea73"
+                "S": "546b764e-aa0a-489c-a7a3-1c4f5b1e32da"
             },
             "task": {
                 "S": "Wash Utensils"
@@ -226,7 +251,7 @@ This Read/Scan was programmatic/console command, now let's automate this via ano
 
 1. Get All records/ To-do's:
 
- awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoApiStack-lambda-8bf6e52b /tmp/output.txt --region us-east-1
+ awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoApiStack-lambda-69354cc1 /tmp/output.txt --region us-east-1
 {
     "StatusCode": 200,
     "LogResult": "",
@@ -239,7 +264,7 @@ This Read/Scan was programmatic/console command, now let's automate this via ano
 
 2. Get specific To-do by UUID:
 
-awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoApiStack-lambda-8bf6e52b /tmp/output.txt --region us-east-1 --payload '{"uuid":"b3fd766b-c2aa-4943-8c8b-268d37dea0ff"}'
+awslocal lambda invoke --endpoint http://localhost:4566 --function-name ToDoApiStack-lambda-69354cc1 /tmp/output.txt --region us-east-1 --payload '{"uuid":"b3fd766b-c2aa-4943-8c8b-268d37dea0ff"}'
 {
     "StatusCode": 200,
     "LogResult": "",
