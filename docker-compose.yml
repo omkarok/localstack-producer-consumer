@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  localstack-server:
+    container_name: "localstack-server"
+    privileged: true
+    image: localstack/localstack
+    ports:
+      - "4566-4599:4566-4599"
+      - "8081:8080"
+    # https://github.com/localstack/localstack#configurations
+    environment:
+      #- SERVICES=s3,dynamodb,lambda,cloudformation,iam
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - PORT_WEB_UI=8080
+        # LAMBDA_EXECUTOR: Method to use for executing Lambda functions. Possible values are:
+        #   local: run Lambda functions in a temporary directory on the local machine
+        #   docker: run each function invocation in a separate Docker container
+        #   docker-reuse: create one Docker container per function and reuse it across invocations
+      - LAMBDA_EXECUTOR=local
+      #- DOCKER_HOST=unix:///var/run/docker.sock
+      - DEFAULT_REGION=us-east-1
+      - START_WEB=1
+    volumes:
+      - "./tmp/localstack:/tmp/localstack"
+      - "./tmp/localstack/run/docker.sock:/var/run/docker.sock"
